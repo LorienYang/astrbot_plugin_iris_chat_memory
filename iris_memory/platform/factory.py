@@ -6,7 +6,7 @@ Iris Chat Memory - 平台适配器工厂
 支持的平台：
 - qq/aiocqhttp: QQ 个人号（OneBot11 协议）
 - cron: AstrBot 内置定时任务（CronMessageEvent）
-- qqofficial: QQ 官方机器人（待实现）
+- qqofficial/qq_official: QQ 官方机器人（待实现）
 - gewechat: 个微（待实现）
 
 设计要点：
@@ -41,6 +41,7 @@ _ADAPTER_REGISTRY: dict[str, type[PlatformAdapter] | None] = {
     "qq": OneBot11Adapter,  # QQ（AstrBot v4.x 统一命名）
     "cron": CronAdapter,  # AstrBot 内置定时任务（CronMessageEvent）
     "qqofficial": None,  # QQ 官方机器人（待实现）
+    "qq_official": None,  # QQ 官方机器人（AstrBot 平台类型别名）
     "gewechat": None,  # 个微（待实现）
 }
 

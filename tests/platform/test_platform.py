@@ -7,7 +7,7 @@ from iris_memory.platform.base import (
     ReplyInfo,
     UnsupportedPlatformError,
 )
-from iris_memory.platform.factory import get_adapter
+from iris_memory.platform.factory import get_adapter, get_supported_platforms
 from iris_memory.platform.generic import GenericAdapter
 from iris_memory.platform.qq import OneBot11Adapter
 
@@ -497,18 +497,22 @@ class TestBaseAdapterGetMsgById:
 class TestGetMentionedUsers:
     """get_mentioned_users 测试（@用户定向功能回归）"""
 
-    def test_factory_degrades_unimplemented_platform(self):
+    @pytest.mark.parametrize("platform_name", ["qqofficial", "qq_official"])
+    def test_factory_degrades_unimplemented_platform(self, platform_name):
         """回归：已注册未实现的平台降级到 GenericAdapter，不抛异常
 
-        历史 bug：qqofficial/gewechat 已注册但 adapter_class=None，
+        历史 bug：QQ 官方机器人名称此前不一致，带下划线的名称未注册；
+        已注册但 adapter_class=None 的平台，
         get_adapter 抛 UnsupportedPlatformError，钩子链无 try/except 兜底，
         每条消息崩溃。
         """
         event = Mock()
         event.platform_meta = Mock()
-        event.platform_meta.name = "qqofficial"
+        event.platform_meta.name = platform_name
         event.platform_meta.id = "test_bot"
+        event.get_platform_name.return_value = platform_name
 
+        assert platform_name in get_supported_platforms()
         adapter = get_adapter(event)
         assert isinstance(adapter, GenericAdapter), (
             "已注册未实现的平台应降级到 GenericAdapter，不抛异常"
