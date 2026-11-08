@@ -1,15 +1,18 @@
 """平台适配器测试"""
 
+from unittest.mock import AsyncMock, Mock
+
 import pytest
-from unittest.mock import Mock, AsyncMock
+
 from iris_memory.platform.base import (
     PlatformAdapter,
     ReplyInfo,
     UnsupportedPlatformError,
 )
-from iris_memory.platform.factory import get_adapter, get_supported_platforms
+from iris_memory.platform.factory import get_adapter
 from iris_memory.platform.generic import GenericAdapter
 from iris_memory.platform.qq import OneBot11Adapter
+from iris_memory.platform.qq_official import QQOfficialAdapter
 
 
 class TestReplyInfo:
@@ -497,26 +500,23 @@ class TestBaseAdapterGetMsgById:
 class TestGetMentionedUsers:
     """get_mentioned_users 测试（@用户定向功能回归）"""
 
-    @pytest.mark.parametrize("platform_name", ["qqofficial", "qq_official"])
-    def test_factory_degrades_unimplemented_platform(self, platform_name):
-        """回归：已注册未实现的平台降级到 GenericAdapter，不抛异常
+    def test_factory_uses_qq_official_websocket_adapter(self):
+        event = Mock()
+        event.get_platform_name.return_value = "qq_official"
 
-        历史 bug：QQ 官方机器人名称此前不一致，带下划线的名称未注册；
-        已注册但 adapter_class=None 的平台，
-        get_adapter 抛 UnsupportedPlatformError，钩子链无 try/except 兜底，
-        每条消息崩溃。
-        """
+        assert isinstance(get_adapter(event), QQOfficialAdapter)
+
+    @pytest.mark.parametrize("platform_name", ["qqofficial", "qq_official_webhook"])
+    def test_factory_does_not_adapt_other_qq_platforms(self, platform_name):
+        """Only the qq_official WebSocket platform gets the dedicated adapter."""
         event = Mock()
         event.platform_meta = Mock()
         event.platform_meta.name = platform_name
         event.platform_meta.id = "test_bot"
         event.get_platform_name.return_value = platform_name
 
-        assert platform_name in get_supported_platforms()
         adapter = get_adapter(event)
-        assert isinstance(adapter, GenericAdapter), (
-            "已注册未实现的平台应降级到 GenericAdapter，不抛异常"
-        )
+        assert isinstance(adapter, GenericAdapter)
 
     def test_base_default_returns_empty(self):
         """基类默认实现返回空列表"""

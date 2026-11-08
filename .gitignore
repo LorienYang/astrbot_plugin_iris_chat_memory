@@ -179,7 +179,6 @@ docs/
 .codebuddy
 
 # agent
-AGENTS.md
 CLAUDE.md
 
 # temp files
@@ -187,3 +186,5 @@ CLAUDE.md
 pyrightconfig.json
 /docker-data
 node_modules/
+*.zip
+.zip

@@ -6,7 +6,7 @@ Iris Chat Memory - 平台适配器工厂
 支持的平台：
 - qq/aiocqhttp: QQ 个人号（OneBot11 协议）
 - cron: AstrBot 内置定时任务（CronMessageEvent）
-- qqofficial/qq_official: QQ 官方机器人（待实现）
+- qq_official: QQ 官方机器人（WebSocket）
 - gewechat: 个微（待实现）
 
 设计要点：
@@ -23,6 +23,7 @@ from iris_memory.platform.base import PlatformAdapter
 from iris_memory.platform.cron import CronAdapter
 from iris_memory.platform.generic import GenericAdapter
 from iris_memory.platform.qq import OneBot11Adapter
+from iris_memory.platform.qq_official import QQOfficialAdapter
 
 if TYPE_CHECKING:
     from astrbot.api.event import AstrMessageEvent
@@ -40,8 +41,8 @@ _ADAPTER_REGISTRY: dict[str, type[PlatformAdapter] | None] = {
     "aiocqhttp": OneBot11Adapter,  # QQ 个人号（OneBot11）
     "qq": OneBot11Adapter,  # QQ（AstrBot v4.x 统一命名）
     "cron": CronAdapter,  # AstrBot 内置定时任务（CronMessageEvent）
-    "qqofficial": None,  # QQ 官方机器人（待实现）
-    "qq_official": None,  # QQ 官方机器人（AstrBot 平台类型别名）
+    "qqofficial": None,  # 旧平台类型名，保持通用降级
+    "qq_official": QQOfficialAdapter,  # QQ 官方机器人（WebSocket）
     "gewechat": None,  # 个微（待实现）
 }
 
@@ -68,7 +69,6 @@ def get_adapter(event: "AstrMessageEvent") -> PlatformAdapter:
         平台适配器实例
 
     Raises:
-        UnsupportedPlatformError: 平台类型未实现或不支持
         ValueError: 无法获取平台类型
 
     Examples:
@@ -209,6 +209,6 @@ def get_supported_platforms() -> list[str]:
 
     Examples:
         >>> platforms = get_supported_platforms()
-        >>> print(platforms)  # ['aiocqhttp', 'qqofficial', 'gewechat']
+        >>> print(platforms)  # includes 'qq_official' (WebSocket)
     """
     return list(_ADAPTER_REGISTRY.keys())

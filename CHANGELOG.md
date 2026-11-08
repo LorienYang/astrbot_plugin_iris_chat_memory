@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### 新增
+
+- 为 AstrBot QQ 官方机器人 WebSocket 平台 `qq_official` 增加专用适配器，提取 OpenID、群会话、图片、回复和提及信息；不包含 `qq_official_webhook`。
+
 ## [0.3.0-hotfix.20261108.2] - 2026-11-08
 
 ### 修复
