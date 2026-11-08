@@ -10,7 +10,7 @@
 
 **让机器人真正"记住你"** — 面向 AstrBot 的智能记忆插件，为群聊场景深度优化。
 
-当前版本：**0.3.0-hotfix.20261108** · [更新日志](CHANGELOG.md) · [版本发布](https://github.com/leafliber/astrbot_plugin_iris_chat_memory/releases)
+当前版本：**0.3.0-hotfix.20261108.2** · [更新日志](CHANGELOG.md) · [版本发布](https://github.com/LorienYang/astrbot_plugin_iris_chat_memory/releases)
 
 你的 Bot 能做到这些吗？
 
