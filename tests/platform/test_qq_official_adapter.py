@@ -88,6 +88,25 @@ class TestQQOfficialAdapter:
 
         assert self.adapter.get_raw_message(event) == payload
 
+    def test_get_raw_message_supports_botpy_slots_and_normalizes_message_id(self):
+        class BotpyMessage:
+            __slots__ = ("attachments", "content", "id", "message_reference")
+
+            def __init__(self):
+                self.id = "botpy-message-1"
+                self.content = "hello"
+                self.message_reference = SimpleNamespace(message_id="quoted-message-1")
+                self.attachments = []
+
+        event = _event(raw_message=BotpyMessage())
+
+        raw_message = self.adapter.get_raw_message(event)
+
+        assert raw_message["id"] == "botpy-message-1"
+        assert raw_message["message_id"] == "botpy-message-1"
+        assert raw_message["content"] == "hello"
+        assert self.adapter.get_reply_info(event).message_id == "quoted-message-1"
+
     def test_extracts_astrbot_image_component(self, image_info_model):
         event = _event(
             message=[

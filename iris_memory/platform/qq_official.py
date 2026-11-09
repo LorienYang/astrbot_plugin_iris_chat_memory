@@ -93,10 +93,25 @@ class QQOfficialAdapter(PlatformAdapter):
 
             if source is not None:
                 try:
-                    source_fields = vars(source)
+                    source_fields = dict(vars(source))
                 except TypeError:
-                    return {}
-                return source_fields if isinstance(source_fields, dict) else {}
+                    source_fields = {}
+
+                for message_type in type(source).__mro__:
+                    slots = getattr(message_type, "__slots__", ())
+                    if isinstance(slots, str):
+                        slots = (slots,)
+                    for field in slots:
+                        if field.startswith("_") or field in source_fields:
+                            continue
+                        try:
+                            source_fields[field] = getattr(source, field)
+                        except AttributeError:
+                            continue
+
+                if "id" in source_fields and "message_id" not in source_fields:
+                    source_fields["message_id"] = source_fields["id"]
+                return source_fields
         except AttributeError:
             logger.debug("QQ Official 事件缺少原始消息")
         return {}
