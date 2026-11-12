@@ -24,6 +24,13 @@ def _component_type(component: Any) -> str:
     return str(getattr(component_type, "value", component_type)).lower()
 
 
+def _normalize_message_fields(fields: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(fields)
+    if "id" in normalized and "message_id" not in normalized:
+        normalized["message_id"] = normalized["id"]
+    return normalized
+
+
 class QQOfficialAdapter(PlatformAdapter):
     """Adapter for AstrBot's QQ Official Bot WebSocket events.
 
@@ -85,11 +92,11 @@ class QQOfficialAdapter(PlatformAdapter):
         try:
             source = getattr(self._message_obj(event), "raw_message", None)
             if isinstance(source, dict):
-                return source
+                return _normalize_message_fields(source)
 
             raw_data = getattr(source, "raw_data", None)
             if isinstance(raw_data, dict):
-                return raw_data
+                return _normalize_message_fields(raw_data)
 
             if source is not None:
                 try:
@@ -109,9 +116,7 @@ class QQOfficialAdapter(PlatformAdapter):
                         except AttributeError:
                             continue
 
-                if "id" in source_fields and "message_id" not in source_fields:
-                    source_fields["message_id"] = source_fields["id"]
-                return source_fields
+                return _normalize_message_fields(source_fields)
         except AttributeError:
             logger.debug("QQ Official 事件缺少原始消息")
         return {}

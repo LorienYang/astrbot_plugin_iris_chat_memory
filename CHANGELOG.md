@@ -6,9 +6,15 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-12
+
 ### 新增
 
 - 为 AstrBot QQ 官方机器人 WebSocket 平台 `qq_official` 增加专用适配器，提取 OpenID、群会话、图片、回复和提及信息；不包含 `qq_official_webhook`。
+
+### 修复
+
+- 归一化 QQ 官方机器人原始消息中的 `id` 为 `message_id`，确保 L1 消息元数据能记录消息 ID。
 
 ## [0.3.0-hotfix.20261108.2] - 2026-11-08
 

@@ -86,7 +86,18 @@ class TestQQOfficialAdapter:
         }
         event = _event(raw_message=SimpleNamespace(raw_data=payload))
 
-        assert self.adapter.get_raw_message(event) == payload
+        assert self.adapter.get_raw_message(event) == {
+            **payload,
+            "message_id": "message-1",
+        }
+        assert "message_id" not in payload
+
+    def test_get_raw_message_preserves_explicit_message_id(self):
+        event = _event(
+            raw_message={"id": "botpy-message-1", "message_id": "astrbot-message-1"}
+        )
+
+        assert self.adapter.get_raw_message(event)["message_id"] == "astrbot-message-1"
 
     def test_get_raw_message_supports_botpy_slots_and_normalizes_message_id(self):
         class BotpyMessage:
